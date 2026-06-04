@@ -286,7 +286,12 @@ export function clientSpecs(): ClientSpec[] {
       path: join(home, ".codeium", "windsurf", "mcp_config.json"),
       fmt: "mcpServers",
     },
-    { key: "claude-code", label: "Claude Code", path: join(home, ".claude.json"), fmt: "mcpServers" },
+    {
+      key: "claude-code",
+      label: "Claude Code",
+      path: join(home, ".claude.json"),
+      fmt: "mcpServers",
+    },
     { key: "cline", label: "Cline", path: cline, fmt: "mcpServers" },
     { key: "vscode", label: "VS Code", path: join(vscodeUser, "mcp.json"), fmt: "vscode" },
     { key: "zed", label: "Zed", path: zed, fmt: "zed" },
@@ -361,7 +366,8 @@ function existingConfig(configArg?: string | null): string | null {
 
 /** Prompt for where a brand-new config should live. */
 async function askScope(): Promise<Scope> {
-  const scope = (await ask("Config scope - [g]lobal or [r]epo? (g/r): ")).trim().toLowerCase() || "g";
+  const scope =
+    (await ask("Config scope - [g]lobal or [r]epo? (g/r): ")).trim().toLowerCase() || "g";
   return scope.startsWith("r") ? "repo" : "global";
 }
 
@@ -662,7 +668,9 @@ export async function cmdReset(configArg?: string | null): Promise<number> {
   }
   let confirm: string;
   try {
-    confirm = (await ask(`Delete ALL connections by removing ${path}? (y/N): `)).trim().toLowerCase();
+    confirm = (await ask(`Delete ALL connections by removing ${path}? (y/N): `))
+      .trim()
+      .toLowerCase();
   } catch (err) {
     if (err instanceof PromptCancelled) {
       console.log("\nCancelled. Nothing deleted.");
@@ -677,7 +685,9 @@ export async function cmdReset(configArg?: string | null): Promise<number> {
     return 0;
   }
   unlinkSync(path);
-  console.log(`Removed all connections (deleted ${path}). Run \`db-conn-mcp setup\` to start fresh.`);
+  console.log(
+    `Removed all connections (deleted ${path}). Run \`db-conn-mcp setup\` to start fresh.`,
+  );
   return 0;
 }
 
@@ -759,7 +769,9 @@ export function buildProgram(): Command {
   });
 
   withConfig(
-    program.command("status").description("Show configured databases and MCP client injection state."),
+    program
+      .command("status")
+      .description("Show configured databases and MCP client injection state."),
   ).action((_opts, command: Command) => {
     process.exitCode = hooks.cmdStatus(cfgOf(command));
   });

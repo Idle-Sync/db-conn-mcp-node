@@ -91,7 +91,7 @@ export function buildServer(configPath?: string | null): McpServer {
     "find_columns",
     {
       description:
-        'Find columns by name across all tables (fuzzy, case-insensitive substring). ' +
+        "Find columns by name across all tables (fuzzy, case-insensitive substring). " +
         'e.g. pattern "email" matches user_email, EMAIL_ADDRESS. Use this to locate where ' +
         "a concept lives before querying.",
       inputSchema: { database: z.string(), pattern: z.string() },
@@ -163,8 +163,7 @@ export function buildServer(configPath?: string | null): McpServer {
   server.registerTool(
     "check_database",
     {
-      description:
-        "Test connectivity for one database (or all) — returns OK or a sanitized cause.",
+      description: "Test connectivity for one database (or all) — returns OK or a sanitized cause.",
       inputSchema: { database: z.string().nullable().optional() },
     },
     async ({ database }) => asContent(await handlers.checkDatabase(database ?? null)),
@@ -237,7 +236,10 @@ async function runHttp(configPath?: string | null): Promise<void> {
 }
 
 /** Launch the server over the chosen transport (`stdio` default, or `http`). */
-export async function run(transport: Transport = "stdio", configPath?: string | null): Promise<void> {
+export async function run(
+  transport: Transport = "stdio",
+  configPath?: string | null,
+): Promise<void> {
   if (transport === "http") {
     await runHttp(configPath);
   } else {

@@ -23,6 +23,13 @@ export const SCHEMES = ["postgresql", "postgres"] as const;
 /** Native, session-level read-only enforcement (the Postgres mechanism). */
 const READ_ONLY_SQL = "SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY";
 
+/**
+ * Prepared-statement name for the read tool. Setting a name makes node-postgres use the
+ * extended protocol, which runs exactly one command (rejecting a piggy-backed statement
+ * at parse time) — the single-command guarantee asyncpg's `fetch()` gives for free.
+ */
+const READ_STATEMENT_NAME = "db_conn_mcp_read";
+
 // Leading keywords that begin a read-only, row-returning statement. This single set
 // does double duty: execute() uses it to shape the result ({columns, rows}), and the
 // read tool uses it as an allowlist (validateReadOnly). The overlap is the point —
@@ -108,7 +115,7 @@ const JUNK_TABLES = new Set(["migrations", "jobs", "failed_jobs", "password_rese
 const JUNK_PREFIXES = ["awsdms_", "pg_stat"];
 
 /** Whether a table is noise skipped by default (an explicit `tables=` overrides this). */
-function isJunkTable(name: string): boolean {
+export function isJunkTable(name: string): boolean {
   return JUNK_TABLES.has(name) || JUNK_PREFIXES.some((prefix) => name.startsWith(prefix));
 }
 
@@ -248,8 +255,13 @@ export class PostgresDialect extends Dialect {
   override async execute(conn: DbConn, sql: string): Promise<Row> {
     const client = asClient(conn);
     if (isRowReturning(sql)) {
-      // Force the extended protocol (empty values) => exactly one command runs.
-      const res = await client.query({ text: sql, values: [] });
+      // Force the extended (prepared) protocol so exactly one command runs: node-postgres
+      // only prepares when a statement *name* is set — an empty values array still uses
+      // the simple protocol, which would let a piggy-backed `; DELETE` through. With a
+      // name, Postgres rejects multi-statement text at parse time ("cannot insert multiple
+      // commands into a prepared statement"), mirroring asyncpg's fetch(). Safe to reuse a
+      // fixed name: a read connection runs exactly one statement before it is closed.
+      const res = await client.query({ name: READ_STATEMENT_NAME, text: sql, values: [] });
       const rows = res.rows as QueryResultRow[];
       const columns = rows.length > 0 ? Object.keys(rows[0]!) : [];
       return { columns, rows };
