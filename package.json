@@ -1,5 +1,5 @@
 {
-  "name": "db-conn-mcp",
+  "name": "@idle-sync/db-conn-mcp",
   "version": "0.3.0",
   "description": "A dead-simple, self-hosted MCP server for securely querying databases via AI agents.",
   "keywords": [

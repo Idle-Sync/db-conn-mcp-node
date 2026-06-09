@@ -25,10 +25,10 @@ Requires **Node.js 18+**.
 
 ```bash
 # Run without installing (recommended for trying it out):
-npx db-conn-mcp setup
+npx @idle-sync/db-conn-mcp setup
 
 # or install globally so `db-conn-mcp` is on your PATH:
-npm install -g db-conn-mcp
+npm install -g @idle-sync/db-conn-mcp
 ```
 
 This provides the `db-conn-mcp` command.
