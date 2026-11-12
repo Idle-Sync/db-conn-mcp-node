@@ -11,6 +11,7 @@ import {
   findUvx,
   launchCommand,
   packageVersion,
+  pypiVersion,
   run,
   uvxArguments,
 } from "../lib/launcher.js";
@@ -54,8 +55,18 @@ test("uvx runs PyPI's db-conn-mcp pinned to this version with the user's argumen
   ]);
 });
 
+test("a launcher-only prerelease runs the PyPI release it is based on", () => {
+  assert.equal(pypiVersion("0.8.2"), "0.8.2");
+  assert.equal(pypiVersion("0.8.2-launcher.1"), "0.8.2");
+  assert.deepEqual(uvxArguments("0.8.2-launcher.1", []), [
+    "--from",
+    "db-conn-mcp==0.8.2",
+    "db-conn-mcp",
+  ]);
+});
+
 test("the npm version is a real version number", () => {
-  assert.match(packageVersion(), /^\d+\.\d+\.\d+$/);
+  assert.match(packageVersion(), /^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/);
 });
 
 test("on macOS and Linux the client runs npx by absolute path when it sits next to node", () => {

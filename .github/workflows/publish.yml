@@ -41,7 +41,14 @@ jobs:
           fi
       - run: npm test
       - name: Publish
-        run: npm publish --access public
+        # A prerelease (a version with a dash, e.g. 0.8.2-launcher.1) goes to the
+        # `next` dist-tag so `latest` keeps pointing at the last full release.
+        run: |
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            npm publish --access public --tag next
+          else
+            npm publish --access public
+          fi
 
   release:
     name: Create GitHub Release
@@ -74,8 +81,13 @@ jobs:
         run: |
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
             echo "Release $GITHUB_REF_NAME already exists, nothing to do."
-          elif [ -s release-notes.md ]; then
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file release-notes.md
           else
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+            FLAGS=()
+            [[ "$GITHUB_REF_NAME" == *-* ]] && FLAGS+=(--prerelease)
+            if [ -s release-notes.md ]; then
+              FLAGS+=(--notes-file release-notes.md)
+            else
+              FLAGS+=(--generate-notes)
+            fi
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" "${FLAGS[@]}"
           fi

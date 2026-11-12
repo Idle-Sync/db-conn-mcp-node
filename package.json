@@ -1,6 +1,6 @@
 {
   "name": "@idle-sync/db-conn-mcp",
-  "version": "0.8.2",
+  "version": "0.8.2-launcher.1",
   "description": "npx launcher for db-conn-mcp: a dead-simple, self-hosted MCP server for safely querying your databases with AI agents. Runs the PyPI release through uv.",
   "keywords": [
     "mcp",

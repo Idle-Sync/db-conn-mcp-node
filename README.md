@@ -54,6 +54,8 @@ Releases publish from GitHub Actions through npm trusted publishing, so no npm t
 1. Bump `version` in `package.json` to the db-conn-mcp version on PyPI, and add its section to `CHANGELOG.md`.
 2. Merge to `master`, then push the tag: `git tag -a vX.Y.Z -m vX.Y.Z && git push origin vX.Y.Z`.
 
+A launcher-only change ships as a prerelease of the PyPI version it runs, such as `0.8.2-launcher.1`. It publishes under the `next` dist-tag, so `latest` stays on the full release, and it runs PyPI's `0.8.2`.
+
 `.github/workflows/publish.yml` checks the tag matches `package.json`, runs the tests, publishes with provenance and creates the GitHub Release from the CHANGELOG section.
 
 ## License
