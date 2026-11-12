@@ -8,10 +8,18 @@ that first when upgrading.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.8.2-launcher.1] — 2026-11-12
+
+Prerelease on the `next` dist-tag; `latest` stays 0.8.2. It runs the same server as 0.8.2.
+
 ### Added
 
 - Releases publish from GitHub Actions on a `vX.Y.Z` tag through npm trusted publishing,
   with provenance, so each version on npm links to the commit and workflow that built it.
+- Launcher-only prereleases: an npm version such as `0.8.2-launcher.1` runs PyPI's
+  `db-conn-mcp==0.8.2` and publishes under the `next` dist-tag.
 
 ## [0.8.2] — 2026-11-12
 
@@ -38,5 +46,6 @@ that first when upgrading.
 
 TypeScript port of db-conn-mcp with 10 tools. Deprecated in favour of 0.8.2.
 
-[Unreleased]: https://github.com/Idle-Sync/db-conn-mcp-node/compare/v0.8.2...HEAD
+[Unreleased]: https://github.com/Idle-Sync/db-conn-mcp-node/compare/v0.8.2-launcher.1...HEAD
+[0.8.2-launcher.1]: https://github.com/Idle-Sync/db-conn-mcp-node/releases/tag/v0.8.2-launcher.1
 [0.8.2]: https://github.com/Idle-Sync/db-conn-mcp-node/releases/tag/v0.8.2
