@@ -1,0 +1,81 @@
+name: Publish to npm
+
+# Publishes to npm via trusted publishing (OIDC): no npm token is stored anywhere.
+# Release: bump package.json, add the CHANGELOG section, merge, then push a vX.Y.Z
+# tag. This checks the tag matches package.json, runs the tests, publishes with
+# provenance and creates the GitHub Release from the CHANGELOG section.
+#
+# One-time setup on npmjs.com: package settings -> Trusted Publisher -> GitHub Actions,
+# organization Idle-Sync, repository db-conn-mcp-node, workflow publish.yml,
+# environment npm.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write # required for trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          # Trusted publishing needs npm 11.5.1 or newer, which ships with Node 24.
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Check the tag matches package.json
+        run: |
+          VERSION="$(node -p 'require("./package.json").version')"
+          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $VERSION"
+            exit 1
+          fi
+      - run: npm test
+      - name: Publish
+        run: npm publish --access public
+
+  release:
+    name: Create GitHub Release
+    needs: publish # only release what actually made it to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the release
+    steps:
+      - uses: actions/checkout@v6
+      - name: Extract this version's section from CHANGELOG.md
+        # Literal prefix matching (index(), not regex) keeps the version's dots and
+        # brackets from needing escaping. Stops at the next "## [" heading or at the
+        # link-reference block.
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v hdr="## [$VERSION]" '
+            index($0, hdr) == 1 { found=1; next }
+            found && index($0, "## [") == 1 { exit }
+            found && index($0, "[") == 1 && index($0, "]: ") > 0 { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md || true
+          if [ -s release-notes.md ]; then
+            cat release-notes.md
+          else
+            echo "::warning::No CHANGELOG.md section for $VERSION; falling back to --generate-notes"
+          fi
+      - name: Create the GitHub Release for this tag (skipped if it already exists)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME already exists, nothing to do."
+          elif [ -s release-notes.md ]; then
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file release-notes.md
+          else
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+          fi
