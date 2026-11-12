@@ -47,6 +47,15 @@ npx @idle-sync/db-conn-mcp@latest setup
 
 Version 0.3.0 was a separate TypeScript port with fewer tools and weaker write safety (no dry-run-first gate, no prompt-injection guard). It is deprecated. From 0.8.2 on, this package runs the Python server, so npm and PyPI users get the same server.
 
+## Releasing
+
+Releases publish from GitHub Actions through npm trusted publishing, so no npm token is stored on any machine:
+
+1. Bump `version` in `package.json` to the db-conn-mcp version on PyPI, and add its section to `CHANGELOG.md`.
+2. Merge to `master`, then push the tag: `git tag -a vX.Y.Z -m vX.Y.Z && git push origin vX.Y.Z`.
+
+`.github/workflows/publish.yml` checks the tag matches `package.json`, runs the tests, publishes with provenance and creates the GitHub Release from the CHANGELOG section.
+
 ## License
 
 MIT

@@ -8,7 +8,10 @@ that first when upgrading.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- Releases publish from GitHub Actions on a `vX.Y.Z` tag through npm trusted publishing,
+  with provenance, so each version on npm links to the commit and workflow that built it.
 
 ## [0.8.2] — 2026-11-12
 
