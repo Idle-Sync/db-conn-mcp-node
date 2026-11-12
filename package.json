@@ -1,7 +1,7 @@
 {
   "name": "@idle-sync/db-conn-mcp",
-  "version": "0.3.0",
-  "description": "A dead-simple, self-hosted MCP server for securely querying databases via AI agents.",
+  "version": "0.8.2",
+  "description": "npx launcher for db-conn-mcp: a dead-simple, self-hosted MCP server for safely querying your databases with AI agents. Runs the PyPI release through uv.",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -13,10 +13,11 @@
   "author": "db-conn-mcp contributors",
   "type": "module",
   "bin": {
-    "db-conn-mcp": "dist/cli.js"
+    "db-conn-mcp": "bin/db-conn-mcp.js"
   },
   "files": [
-    "dist",
+    "bin",
+    "lib",
     "README.md",
     "LICENSE"
   ],
@@ -29,31 +30,14 @@
     "url": "git+https://github.com/Idle-Sync/db-conn-mcp-node.git"
   },
   "bugs": {
-    "url": "https://github.com/Idle-Sync/db-conn-mcp-node/issues"
+    "url": "https://github.com/Idle-Sync/db-conn-mcp/issues"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsx src/cli.ts",
-    "start": "node dist/cli.js",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "prepublishOnly": "npm run build"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0",
-    "commander": "^12.1.0",
-    "pg": "^8.13.0",
-    "zod": "^3.23.0"
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@types/node": "^20.14.0",
-    "@types/pg": "^8.11.0",
-    "prettier": "^3.3.0",
-    "tsx": "^4.16.0",
-    "typescript": "^5.5.0",
-    "vitest": "^3.2.6"
+    "prettier": "^3.3.0"
   }
 }
